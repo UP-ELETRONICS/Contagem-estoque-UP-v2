@@ -1,0 +1,892 @@
+/* 1. Variáveis Globais (Root) */
+:root {
+  --bg: #0b0b0f;
+  --surface: #121217;
+  --surface-2: #16161d;
+  --text: #eaeaf2;
+  --muted: #b7b7c9;
+  --brand: #00d4ff;
+  --brand-2: #35a7ff;
+  --accent: #2a2a38;
+  --ring: #2d89ff;
+  --ok: #36d399;
+  --err: #f87272;
+  --warn: #fbbd23;
+  color-scheme: dark;
+}
+
+/* 2. Estilos Base e Resets */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+  line-height: 1.45;
+}
+
+/* 3. Layout Principal */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.05));
+  backdrop-filter: saturate(1.1) blur(8px);
+  -webkit-backdrop-filter: saturate(1.1) blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: padding .2s ease, box-shadow .2s ease;
+  padding: 12px 16px;
+}
+
+.header.compact {
+  padding: 6px 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .25);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo img {
+  max-height: 34px;
+  display: block;
+}
+
+.title {
+  display: none; /* Oculta o título principal, opcional */
+}
+@media (min-width: 500px) {
+  .title { display: block; }
+}
+.title h1 {
+  font-size: clamp(18px, 3.8vw, 22px);
+  margin: 0;
+  letter-spacing: .3px;
+}
+.title p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Campos de Cliente (Topo) */
+.client-info {
+  max-width: 1200px;
+  margin: 12px auto;
+  padding: 0 12px;
+}
+
+.toolbar {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+  max-width: 1200px;
+  margin: 12px auto;
+  padding: 0 12px;
+}
+
+@media (min-width: 720px) {
+  .toolbar {
+    grid-template-columns: 1fr 220px 160px;
+    align-items: center;
+  }
+}
+
+.grid {
+  max-width: 1200px;
+  margin: 8px auto 40px;
+  padding: 0 12px;
+  display: grid;
+  gap: 14px;
+  /* minmax(85px, 1fr) para forçar mais colunas no mobile */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* 4. Componentes */
+
+/* --- Cards --- */
+.card {
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .25);
+}
+
+.card-img {
+  aspect-ratio: 1 / 1;
+  background: var(--accent);
+  display: grid;
+  place-items: center;
+  cursor: zoom-in; /* Indica que a imagem é "clicável" */
+  user-select: none; 
+  -webkit-user-select: none;
+}
+
+.card-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none; /* Garante que o evento 'segurar' pegue no div pai */
+}
+
+.card-body {
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 12px; /* Reduzido para caber melhor no grid 3x */
+}
+
+.sku,
+.cat {
+  color: var(--muted);
+  font-size: 10px; /* Reduzido */
+}
+.cat {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compat {
+  display: none; /* Oculto para economizar espaço no grid pequeno */
+}
+
+.actions {
+  margin-top: auto; /* Empurra o botão para baixo */
+  padding-top: 4px;
+}
+
+/* --- Botões --- */
+.button {
+  background: var(--surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--text);
+  outline: none;
+}
+
+.btn {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, .09);
+  background: linear-gradient(180deg, var(--brand), var(--brand-2));
+  color: #081018;
+  font-weight: 700;
+  letter-spacing: .3px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: transform .06s ease, filter .1s ease, background .2s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+  filter: brightness(.95);
+}
+.btn:disabled {
+  background: var(--accent);
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+
+.btn-whats {
+  background: linear-gradient(180deg, #25D366, #138E4C);
+  color: #03170e;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px dashed rgba(255, 255, 255, .25);
+  padding: 8px 10px; /* Menor padding para botões de fechar */
+}
+
+/* --- Formulários (Inputs/Selects) --- */
+.search,
+.select {
+  background: var(--surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--text);
+  outline: none;
+}
+
+.search:focus,
+.select:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(45, 137, 255, .25);
+}
+
+/* --- Modal --- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  z-index: 60;
+}
+
+.modal {
+  width: min(560px, 100%);
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .45);
+}
+
+.modal-header {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-title {
+  font-weight: 700;
+}
+
+.modal-body {
+  padding: 12px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+/* Estilos de formulário (Global e Modal) */
+.row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 560px) {
+  .row.two {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+label {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  
+  margin-bottom: 4px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(45, 137, 255, .25);
+}
+
+.modal-actions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+  margin-top: 10px;
+}
+
+/* --- Toast --- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .45);
+  z-index: 80;
+  display: none;
+  transition: all 0.3s ease;
+}
+
+/* --- Cart Button (no header) --- */
+.cart-button {
+  margin-left: auto;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  position: relative;
+  font-size: 18px;
+  transition: background .2s ease;
+}
+
+.cart-button:hover {
+  background: var(--surface);
+}
+
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background: var(--brand);
+  color: #081018;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  min-width: 18px;
+  height: 18px;
+  display: none;
+  place-items: center;
+  padding: 2px;
+  line-height: 1;
+}
+
+/* --- Estilos do Modal de Checkout --- */
+.modal-checkout {
+  width: min(640px, 100%);
+}
+
+#cart-items-list {
+  display: grid;
+  gap: 12px;
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 8px;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+
+.cart-item {
+  display: grid;
+  /* ATUALIZADO: Colunas para acomodar o input de qtd */
+  grid-template-columns: 1fr auto auto; 
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: var(--surface);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, .05);
+}
+
+.cart-item-info .name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.cart-item-info .sku {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Input de quantidade dentro do carrinho */
+.cart-item-qty-input {
+  width: 60px; /* Largura fixa para o input de Qtd */
+  padding: 6px 8px;
+  text-align: center;
+  /* Usa estilos de input globais */
+}
+
+.cart-remove-item {
+  background: transparent;
+  border: none;
+  color: var(--err);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.cart-remove-item:hover {
+  opacity: 0.8;
+}
+
+/* Estilo do Total do Carrinho */
+.cart-total {
+  padding: 12px 10px;
+  margin-top: 10px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+}
+
+.cart-total span {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ok); /* Verde */
+}
+
+/* Estilo Obs Gerais */
+.cart-obs-gerais {
+  margin-top: 10px;
+}
+.cart-obs-gerais textarea {
+  resize: vertical;
+  min-height: 40px;
+  line-height: 1.4;
+}
+
+/* Ações do checkout lado a lado em telas maiores */
+@media (min-width: 520px) {
+  .checkout-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* --- Zoom Overlay --- */
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  cursor: zoom-out;
+}
+.zoom-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+.zoom-overlay img {
+  max-width: 90%;
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  object-fit: contain;
+}
+
+/* 6. Estilos do Botão Superior de Impressão */
+.top-button-container {
+ display: flex;
+ justify-content: center;
+ padding: 8px 12px;
+ max-width: 1200px;
+ margin: 0 auto;
+}
+.btn-print {
+ /* ATUALIZADO: Copiado do .btn para ficar azul */
+ background: linear-gradient(180deg, var(--brand), var(--brand-2));
+ color: #081018;
+ border: 1px solid rgba(255, 255, 255, .09);
+ font-weight: 700;
+ 
+ /* Estilos de layout mantidos */
+ font-size: 12px;
+ width: auto; /* Não ocupa 100% */
+ padding: 10px 16px;
+ 
+ /* Interação do .btn */
+ cursor: pointer;
+ transition: transform .06s ease, filter .1s ease, background .2s ease;
+}
+.btn-print:hover {
+ /* ATUALIZADO: Efeito de hover/active do .btn */
+ filter: brightness(.95);
+}
+
+/* 7. Estilos do Formulário de Impressão */
+.print-form-container {
+ display: none; /* Começa oculto */
+ position: fixed;
+ inset: 0;
+ background: rgba(0, 0, 0, 0.8);
+ backdrop-filter: blur(4px);
+ -webkit-backdrop-filter: blur(4px);
+ z-index: 100;
+ overflow-y: auto;
+ padding: 24px;
+}
+
+.print-actions-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 20px;
+ border-bottom: 2px dashed #ccc;
+ padding-bottom: 15px;
+}
+.close-print-btn {
+ background: #f1f1f1;
+ color: #333;
+ border: 1px solid #ccc;
+ border-radius: 8px;
+ padding: 8px 14px;
+ font-size: 16px;
+ font-weight: bold;
+ cursor: pointer;
+}
+.btn-real-print {
+ background: #007bff;
+ color: #fff;
+ border: none;
+ border-radius: 8px;
+ padding: 10px 18px;
+ font-size: 16px;
+ font-weight: bold;
+ cursor: pointer;
+}
+
+.print-header {
+ display: flex;
+ align-items: center;
+ border-bottom: 2px solid #000;
+ padding-bottom: 15px;
+ margin-bottom: 20px;
+}
+.print-header-logo img {
+ max-height: 60px;
+ margin-right: 20px;
+}
+.print-header-text h1 {
+ margin: 0;
+ font-size: 24px;
+ font-weight: bold;
+}
+.print-header-text h2 {
+ margin: 0;
+ font-size: 18px;
+ font-weight: normal;
+ color: #333;
+
+.print-header-text p {
+ margin: 0;
+ font-size: 14px;
+ color: #555;
+}
+
+.print-form-section {
+ font-size: 14px;
+ margin-bottom: 15px;
+}
+.form-underline {
+ border-bottom: 1px solid #555;
+ display: inline-block;
+ min-width: 250px;
+ height: 20px;
+ margin-left: 8px;
+}
+.form-underline.long {
+ width: calc(100% - 120px);
+}
+
+.print-registration-section {
+ display: flex;
+ justify-content: space-between;
+ flex-wrap: wrap;
+ margin-bottom: 20px;
+ font-size: 14px;
+}
+.print-registration-field {
+ flex-basis: 32%;
+}
+
+.print-section-title {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    border-bottom: 2px solid #222;
+    padding-bottom: 2px;
+    text-align: left;
+    margin-left: 15mm;
+    margin-right: 15mm;
+}
+
+.print-products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-left: 15mm;
+    padding-right: 15mm;
+    page-break-inside: avoid;
+}
+.print-product-card {
+    border: 2px solid #222;
+    border-radius: 4px;
+    padding: 6px;
+    min-height: 75px;
+    background: #fff;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    page-break-inside: avoid;
+}
+
+.print-product-header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 3px;
+    width: 100%;
+}
+.print-product-image {
+    width: 75px;
+    height: 75px;
+    border-radius: 6px;
+    background: #fafafa;
+    border: 2px solid #bbb;
+    object-fit: contain;
+}
+
+.print-product-info {
+    visibility: visible; /* Garante que está visível */
+}
+
+.print-product-name {
+    font-weight: bold;
+    font-size: 13px;
+    color: #222;
+}
+
+.print-product-code {
+    font-weight: bold;
+    font-size: 11px;
+    color: #fff;
+    background: #232323;
+    padding: 3px 7px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 2px;
+}
+
+.print-product-compatibility {
+    font-size: 10px;
+    color: #444;
+    font-style: italic;
+    margin-top: 3px;
+    max-width: 120px;
+}
+.print-product-row-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+    margin-left: 0;
+}
+.print-stock-label {
+    font-size: 10px;
+    font-weight: bold;
+    color: #222;
+}
+
+.print-stock-input {
+    border: 2px solid #222;
+    width: 35px;
+    height: 18px;
+    border-radius: 4px;
+    background: #fff;
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: #222;
+    padding: 0;
+    margin: 0;
+}
+
+.print-observations-section {
+    border: 2px solid #232323;
+    min-height: 100px;
+    background: #fff;
+    border-radius: 6px;
+    width: auto;
+    margin-top: 6px;
+    margin-left: 15mm;
+    margin-right: 15mm;
+    page-break-inside: avoid;
+}
+.print-observations-header {
+    background: #e9e9e9;
+    padding: 5px 12px;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #aaa;
+    border-radius: 4px 4px 0 0;
+}
+.print-observations-content {
+    padding: 12px;
+    min-height: 20px;
+    font-size: 11px;
+    color: #222;
+}
+
+.print-signature-section {
+    margin-top: 4px;
+    font-size: 17px;
+    text-align: center;
+    padding-top: 25px;
+    width: auto;
+    padding-left: 15mm;
+    padding-right: 15mm;
+    page-break-inside: avoid;
+}
+.print-signature-line {
+    display: inline-block;
+    border-bottom: 1px solid #111;
+    width: 300px;
+    margin: 0 20px;
+}
+.auto-datetime {
+    font-weight: bold;
+    color: #000;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-size: 14px;
+}
+
+.print-footer {
+    margin-top: 8px;
+    font-size: 9px;
+    text-align: center;
+    color: #777;
+    border-top: 1px solid #ccc;
+    padding-top: 4px;
+    padding-left: 15mm;
+    padding-right: 15mm;
+    page-break-inside: avoid;
+}
+
+
+/* 8. Estilos de Impressão (@media print) */
+@media print {
+ /* Oculta tudo que NÃO é o formulário */
+ body * {
+  visibility: hidden;
+ }
+ /* Mostra o formulário e seus filhos */
+ .print-form-container,
+ .print-form-container * {
+  visibility: visible;
+ }
+ 
+ /* Expande o formulário para a página inteira */
+ .print-form-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+ 	z-index: 9999;
+ }
+ 
+ /* Remove sombras e bordas da "página" */
+.print-page {
+    width: 210mm;
+    padding: 1mm;
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.2;
+    box-sizing: border-box;
+}
+
+.print-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.print-header-logo img {
+    width: 65px; /* Mantendo seu tamanho original */
+    height: 65px;
+}
+
+.print-header-text {
+    flex: 1;
+    text-align: left;
+}
+
+.print-info-block {
+    text-align: right; /* Alinha os campos à direita */
+    min-width: 40%; 
+    padding-top: 5px; /* Ajuste vertical para alinhar visualmente */
+
+}
+
+.print-form-section {
+    font-size: 17px;
+    display: flex;
+    justify-content: flex-end; /* Alinha esta linha à direita */
+    align-items: baseline;
+    margin-bottom: 8px; /* <- ADICIONA ESPAÇO VERTICAL */
+    gap: 6px;
+    margin-top: 0; /* Limpando regras antigas */
+}
+
+.form-underline {
+    border-bottom: 1.5px solid #000;
+    display: inline-block;
+    min-width: 200px; /* Defina uma largura fixa para a linha */
+    /* Removemos flex-grow e outros */
+}
+ 
+ /* Oculta os botões de fechar e imprimir */
+ .print-actions-header {
+  display: none !important;
+ }
+
+ /* Evita que os cards quebrem entre páginas */
+ .print-product-card,
+ .print-observations-section,
+ .print-signature-section {
+  page-break-inside: avoid;
+ }
+}
+}
+
