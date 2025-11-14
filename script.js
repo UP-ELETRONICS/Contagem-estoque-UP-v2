@@ -61,7 +61,8 @@ const SKU_CURINGA = 'XXXXX'; // SKU especial para o item curinga
 let carrinho = []; // Agora armazena objetos de produto
 let __modalOpener = null;
 let __trapHandler = null;
-let zoomHoldTimer = null;
+let zoomHoldTimer = null; // Timer para o "segurar" do zoom
+let isZooming = false; // Flag para rastrear se o zoom está ativo
 // A variável 'produtos' será carregada do 'products.js'
 
 /*
@@ -778,11 +779,12 @@ function onScroll() {
   else hdr.classList.remove('compact');
 }
 
-// Funções de Zoom (MODIFICADAS)
+// ==================================================
+// NOVAS FUNÇÕES DE ZOOM (SUBSTITUIR AS ANTIGAS)
+// ==================================================
 function showZoom(src) {
-  // Mostra o zoom se um 'src' válido for passado
   if (!src) return;
-  isZooming = true;
+  isZooming = true; // Define a flag que o zoom está ativo
   zoomOverlayImg.src = src;
   zoomOverlay.classList.add('visible');
 }
@@ -806,8 +808,11 @@ function hideZoom() {
 
 // Novas funções de controle do zoom (para segurar 2 segundos)
 function handleZoomStart(e) {
-  // Ignora clique direito/meio
+  // Ignora clique direito do mouse
   if (e.type === 'mousedown' && e.button !== 0) return; 
+
+  // Se o zoom já estiver ativo, não faz nada (evita re-abrir)
+  if (isZooming) return;
 
   const cardImg = e.target.closest('.card-img');
   if (!cardImg) return;
@@ -818,11 +823,11 @@ function handleZoomStart(e) {
     zoomHoldTimer = null;
     return;
   }
-
+  
   // Limpa qualquer timer anterior
   clearTimeout(zoomHoldTimer);
   
-  // Inicia o timer para "segurar" por 2 segundos
+  // Define o timer de 2 segundos
   zoomHoldTimer = setTimeout(() => {
     // Se o timer completar, previne o comportamento padrão (como scroll)
     if (e.cancelable) e.preventDefault(); 
@@ -831,6 +836,7 @@ function handleZoomStart(e) {
   }, 2000); // 2000ms = 2 segundos
 }
 
+// 2. Cancela o timer se mover (scroll/arrastar)
 function handleZoomMove(e) {
   // Se o usuário mover o dedo/mouse, cancela o timer
   if (zoomHoldTimer) {
@@ -852,6 +858,9 @@ function handleZoomEnd(e) {
     hideZoom();
   }
 }
+// ==================================================
+// FIM DAS NOVAS FUNÇÕES DE ZOOM
+// ==================================================
 
 /*
  * =========================================
