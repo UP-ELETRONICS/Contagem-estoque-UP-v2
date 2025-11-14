@@ -161,11 +161,20 @@ function maskCNPJ(v) {
 function productCard(p, term) {
   const img = p.imagem || '';
   const compat = p.compatibilidade || '';
+
+  // *** INÍCIO DA CORREÇÃO 1 ***
+  // Define o SRC da imagem corretamente
+  // Se 'img' for a string "placeholder" ou vazia, usa a URL do placehold.co
+  const imgSrc = (img && img !== 'placeholder') 
+    ? img 
+    : 'https://placehold.co/220x220/2a2a38/b7b7c9?text=Imagem';
+  // *** FIM DA CORREÇÃO 1 ***
+
   return `
     <article class="card" data-nome="${p.produto}" data-cod="${p.codigo}" data-cat="${p.categoria}">
       <div class="card-img">
         <img loading="lazy" 
-             src="${img || 'https://placehold.co/220x220/2a2a38/b7b7c9?text=Imagem'}" 
+             src="${imgSrc}" 
              alt="${p.produto}">
       </div>
       <div class="card-body">
@@ -465,16 +474,16 @@ function validateCheckout() {
     showToast('O campo "Nome do Cliente" é obrigatório.', true);
     return false;
   }
-  if (!clienteCnpj.value.trim()) {
+  /*if (!clienteCnpj.value.trim()) {
     showToast('O campo "CNPJ" é obrigatório.', true);
     return false;
-  }
+  }*/
   
   // O campo representante-comercial está desativado no HTML e no JS, então esta validação já estava (corretamente) comentada.
-  if (!representanteComercial.value.trim()) {
+  /*if (!representanteComercial.value.trim()) {
     showToast('O campo "Representante Comercial" é obrigatório.', true);
     return false;
-  }
+  }*/
 
   if (!clienteResponsavel.value.trim()) {
     showToast('O campo "Responsável" é obrigatório.', true);
@@ -804,11 +813,11 @@ function hideZoom() {
     setTimeout(() => { 
       zoomOverlayImg.src = ''; 
       isZooming = false; // Limpa a flag SÓ DEPOIS da animação
-    }, 200); // 200ms para corresponder à animação CSS e evitar o "crash"
+    }, 200); // <-- CORRIGIDO: O "crash" era 2000ms. O correto é 200ms
   }
 }
 
-// Novas funções de controle do zoom (para segurar 2 segundos)
+// 1. Inicia o timer ao tocar/clicar
 function handleZoomStart(e) {
   // Ignora clique direito do mouse
   if (e.type === 'mousedown' && e.button !== 0) return; 
@@ -820,11 +829,23 @@ function handleZoomStart(e) {
   if (!cardImg) return;
   
   const img = cardImg.querySelector('img');
-  if (!img || !img.src || img.src.includes('placehold.co')) {
+
+  // *** INÍCIO DA CORREÇÃO 2 ***
+  // CORREÇÃO: Removemos o bloqueio de 'placehold.co'
+  // Apenas verificamos se a imagem e o src existem
+  if (!img || !img.src) {
     clearTimeout(zoomHoldTimer);
     zoomHoldTimer = null;
     return;
   }
+  
+  // Opcional: Ainda podemos bloquear o item curinga (que tem '?')
+  if (img.src.includes('text=?')) {
+      clearTimeout(zoomHoldTimer);
+      zoomHoldTimer = null;
+      return;
+  }
+  // *** FIM DA CORREÇÃO 2 ***
   
   // Armazena o SRC para o timer e reseta o 'isMoving'
   zoomTargetSrc = img.src;
@@ -938,12 +959,12 @@ function setupEventListeners() {
     openModal();
   });
   
-  // --- Grid (Zoom da Imagem) ---
+  // --- Grid (Zoom da Imagem) --- (LÓGICA SUBSTITUÍDA)
   // Eventos de mouse (Desktop)
   grid.addEventListener('mousedown', handleZoomStart);
+  grid.addEventListener('mousemove', handleZoomMove);
   grid.addEventListener('mouseup', handleZoomEnd);
-  grid.addEventListener('mouseleave', handleZoomEnd); // Para mouse sair do grid
-  grid.addEventListener('mousemove', handleZoomMove); // <-- ADICIONADO
+  grid.addEventListener('mouseleave', handleZoomEnd); // Cancela se o mouse sair do grid
 
   // Eventos de toque (Mobile)
   // CORRIGIDO: { passive: false } é necessário para que o e.preventDefault()
@@ -958,7 +979,7 @@ function setupEventListeners() {
   // REMOVIDO: O fechamento agora é só no 'handleZoomEnd' (soltar)
   // zoomOverlay.addEventListener('click', hideZoom); 
   // zoomOverlay.addEventListener('touchend', hideZoom); 
-  // ADICIONADO: Evento de 'click' no overlay para fechar (backup)
+  // ADICIONADO: Evento de 'click' no overlay para fechar (backup, caso o 'mouseup' falhe)
   zoomOverlay.addEventListener('click', hideZoom);
 
   // --- Modal de Item (Ações) ---
