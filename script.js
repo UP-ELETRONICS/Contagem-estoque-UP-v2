@@ -162,7 +162,7 @@ function productCard(p, term) {
   const img = p.imagem || '';
   const compat = p.compatibilidade || '';
 
-  // *** INÍCIO DA CORREÇÃO 1 ***
+  // *** CORREÇÃO 1 APLICADA ***
   // Define o SRC da imagem corretamente
   // Se 'img' for a string "placeholder" ou vazia, usa a URL do placehold.co
   const imgSrc = (img && img !== 'placeholder') 
@@ -830,8 +830,8 @@ function handleZoomStart(e) {
   
   const img = cardImg.querySelector('img');
 
-  // *** INÍCIO DA CORREÇÃO 2 ***
-  // CORREÇÃO: Removemos o bloqueio de 'placehold.co'
+  // *** CORREÇÃO 2 APLICADA ***
+  // Correção: Removemos o bloqueio de 'placehold.co'
   // Apenas verificamos se a imagem e o src existem
   if (!img || !img.src) {
     clearTimeout(zoomHoldTimer);
@@ -971,7 +971,11 @@ function setupEventListeners() {
   // dentro do handleZoomStart (no setTimeout) possa funcionar e
   // impedir o scroll CASO o zoom seja ativado.
   grid.addEventListener('touchstart', handleZoomStart, { passive: false }); 
-  grid.addEventListener('touchmove', handleZoomMove, { passive: false });
+  
+  // *** CORREÇÃO 3 APLICADA ***
+  // Removido { passive: false } para não interferir com o scroll
+  grid.addEventListener('touchmove', handleZoomMove);
+  
   grid.addEventListener('touchend', handleZoomEnd);
   grid.addEventListener('touchcancel', handleZoomEnd);
 
@@ -1128,8 +1132,13 @@ function populatePrintGrid() {
 
   // Gera o HTML para cada card de produto
   gridContainer.innerHTML = produtosParaImprimir.map(produto => {
+    
+    // *** CORREÇÃO 4 APLICADA ***
     // Usa 'placeholder' se a imagem não estiver definida
-    const imagemSrc = produto.imagem || 'placeholder';
+    const imagemSrc = (produto.imagem && produto.imagem !== 'placeholder') 
+      ? produto.imagem 
+      : 'https://placehold.co/220x220/2a2a38/b7b7c9?text=Imagem';
+      
     const compatibilidade = produto.compatibilidade || ''; // Pega a compatibilidade ou usa string vazia
 
     return `
