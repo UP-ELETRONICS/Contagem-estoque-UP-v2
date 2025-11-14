@@ -61,6 +61,7 @@ const SKU_CURINGA = 'XXXXX'; // SKU especial para o item curinga
 let carrinho = []; // Agora armazena objetos de produto
 let __modalOpener = null;
 let __trapHandler = null;
+let zoomHoldTimer = null;
 // A variável 'produtos' será carregada do 'products.js'
 
 /*
