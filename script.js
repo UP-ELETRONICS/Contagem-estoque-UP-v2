@@ -946,10 +946,13 @@ function setupEventListeners() {
   grid.addEventListener('mousemove', handleZoomMove); // <-- ADICIONADO
 
   // Eventos de toque (Mobile)
+  // CORRIGIDO: { passive: false } é necessário para que o e.preventDefault()
+  // dentro do handleZoomStart (no setTimeout) possa funcionar e
+  // impedir o scroll CASO o zoom seja ativado.
   grid.addEventListener('touchstart', handleZoomStart, { passive: false }); 
+  grid.addEventListener('touchmove', handleZoomMove, { passive: false });
   grid.addEventListener('touchend', handleZoomEnd);
   grid.addEventListener('touchcancel', handleZoomEnd);
-  grid.addEventListener('touchmove', handleZoomMove); // <-- MUDADO para handleZoomMove
 
   // --- Eventos para fechar o zoom ---
   // REMOVIDO: O fechamento agora é só no 'handleZoomEnd' (soltar)
