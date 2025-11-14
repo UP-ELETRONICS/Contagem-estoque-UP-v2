@@ -799,7 +799,7 @@ function showZoom(e) {
 function hideZoom() {
   zoomOverlay.classList.remove('visible');
   // Atraso para a animação de fade-out terminar antes de limpar o src
-  setTimeout(() => { zoomOverlayImg.src = ''; }, 200);
+  setTimeout(() => { zoomOverlayImg.src = ''; }, 2000);
 }
 
 /*
