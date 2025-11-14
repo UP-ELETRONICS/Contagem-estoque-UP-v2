@@ -63,6 +63,8 @@ let __modalOpener = null;
 let __trapHandler = null;
 let zoomHoldTimer = null; // Timer para o "segurar" do zoom
 let isZooming = false; // Flag para rastrear se o zoom está ativo
+let isMoving = false; // Flag para rastrear se o usuário está arrastando (scroll)
+let zoomTargetSrc = null; // Armazena o src da imagem para o timer
 // A variável 'produtos' será carregada do 'products.js'
 
 /*
@@ -824,14 +826,20 @@ function handleZoomStart(e) {
     return;
   }
   
+  // Armazena o SRC para o timer e reseta o 'isMoving'
+  zoomTargetSrc = img.src;
+  isMoving = false;
+  
   // Limpa qualquer timer anterior
   clearTimeout(zoomHoldTimer);
   
   // Define o timer de 2 segundos
   zoomHoldTimer = setTimeout(() => {
-    // Se o timer completar, previne o comportamento padrão (como scroll)
-    if (e.cancelable) e.preventDefault(); 
-    showZoom(img.src);
+    // Se o timer completar E o usuário não tiver movido, mostra o zoom
+    if (!isMoving) {
+      if (e.cancelable) e.preventDefault(); 
+      showZoom(zoomTargetSrc);
+    }
     zoomHoldTimer = null; // Limpa o timer
   }, 2000); // 2000ms = 2 segundos
 }
@@ -839,6 +847,7 @@ function handleZoomStart(e) {
 // 2. Cancela o timer se mover (scroll/arrastar)
 function handleZoomMove(e) {
   // Se o usuário mover o dedo/mouse, cancela o timer
+  isMoving = true;
   if (zoomHoldTimer) {
     clearTimeout(zoomHoldTimer);
     zoomHoldTimer = null;
@@ -852,11 +861,17 @@ function handleZoomEnd(e) {
     clearTimeout(zoomHoldTimer);
     zoomHoldTimer = null;
   }
+  
   // Se o zoom estiver visível (segurou por 2s e agora soltou), fecha.
-  else if (isZooming) {
+  if (isZooming) {
+    // Usar preventDefault aqui pode ser necessário para evitar "clique fantasma" no mobile
     if(e.cancelable) e.preventDefault();
     hideZoom();
   }
+  
+  // Reseta as flags
+  isMoving = false;
+  zoomTargetSrc = null;
 }
 // ==================================================
 // FIM DAS NOVAS FUNÇÕES DE ZOOM
@@ -940,6 +955,8 @@ function setupEventListeners() {
   // REMOVIDO: O fechamento agora é só no 'handleZoomEnd' (soltar)
   // zoomOverlay.addEventListener('click', hideZoom); 
   // zoomOverlay.addEventListener('touchend', hideZoom); 
+  // ADICIONADO: Evento de 'click' no overlay para fechar (backup)
+  zoomOverlay.addEventListener('click', hideZoom);
 
   // --- Modal de Item (Ações) ---
   btnAdicionar.addEventListener('click', adicionarAoCarrinho);
