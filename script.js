@@ -274,8 +274,8 @@ function validateAdicionar() {
   const qtd = parseInt(mQtd.value, 10);
   if (!(qtd > 0)) return 'Quantidade inválida (deve ser 1 ou mais).';
   
-  /*const valor = parseFloat(mValor.value.replace(',', '.')) || 0;
-  if (!(valor > 0)) return 'Valor do item inválido.';*/
+  const valor = parseFloat(mValor.value.replace(',', '.')) || 0;
+  if (!(valor > 0)) return 'Valor do item inválido.';
   
   // CORREÇÃO: Validação do item curinga
   const nome = mProduto.value.trim();
@@ -330,7 +330,7 @@ function adicionarAoCarrinho() {
       obs: obs
     };
     carrinho.push(produto);
-    showToast(`${produto.nome} adicionado a contagem!`);
+    showToast(`${produto.nome} adicionado ao pedido!`);
   }
 
   closeModal();
@@ -410,7 +410,7 @@ function renderizarCarrinho() {
       <div class="cart-item">
         <div class="cart-item-info">
           <div class="name">${escapeHtml(item.nome)}</div>
-          <div class="sku">SKU: ${escapeHtml(item.sku)} </div>
+          <div class="sku">SKU: ${escapeHtml(item.sku)} | Valor: ${formatCurrency(item.valor)}</div>
           ${item.obs ? `<div class="sku">Obs: ${escapeHtml(item.obs)}</div>` : ''}
         </div>
         <div class="cart-item-qty">
@@ -436,7 +436,7 @@ function renderizarCarrinho() {
 /** Remove um item do carrinho pelo ID único. */
 function removerItemCarrinho(id) {
   carrinho = carrinho.filter(item => item.id !== id);
-  showToast('Item removido da contagem.');
+  showToast('Item removido do pedido.');
   atualizarContadorCarrinho();
   renderizarCarrinho(); // Re-renderiza a lista no modal
 }
@@ -462,16 +462,16 @@ function validateCheckout() {
     showToast('O campo "Nome do Cliente" é obrigatório.', true);
     return false;
   }
-  /*if (!clienteCnpj.value.trim()) {
+  if (!clienteCnpj.value.trim()) {
     showToast('O campo "CNPJ" é obrigatório.', true);
     return false;
-  }*/
+  }
   
   // O campo representante-comercial está desativado no HTML e no JS, então esta validação já estava (corretamente) comentada.
-  /*if (!representanteComercial.value.trim()) {
+  if (!representanteComercial.value.trim()) {
     showToast('O campo "Representante Comercial" é obrigatório.', true);
     return false;
-  }*/
+  }
 
   if (!clienteResponsavel.value.trim()) {
     showToast('O campo "Responsável" é obrigatório.', true);
@@ -497,7 +497,7 @@ function buildCheckoutMessage() {
   const obsGerais = checkoutObs.value.trim(); 
 
   const linhas = [
-    'Contagem UP Electronics',
+    'Pedido UP Electronics',
     '====================',
     '',
     'Dados do Cliente:',
@@ -506,7 +506,7 @@ function buildCheckoutMessage() {
     // `Representante: ${hRep}`, // AJUSTE: Linha removida
     `Responsável: ${hResp}`,
     '',
-    'Itens da Contagem:',
+    'Itens do Pedido:',
     '====================',
   ];
 
@@ -518,22 +518,21 @@ function buildCheckoutMessage() {
   carrinho.forEach(item => {
     linhas.push(
 `Produto: ${item.nome} (SKU ${item.sku})
-Qtd: ${item.quantidade}`
-
-/*Valor Unit.: ${formatCurrency(item.valor)}
+Qtd: ${item.quantidade}
+Valor Unit.: ${formatCurrency(item.valor)}
 Total Item: ${formatCurrency(item.valor * item.quantidade)}` +
 (item.obs ? `
 Obs: ${item.obs}` : '') +
 `
---------------------`*/
+--------------------`
     );
   });
   
-  /*const totalGeral = carrinho.reduce((total, item) => total + (item.valor * item.quantidade), 0);
-  linhas.push(`*VALOR TOTAL DO PEDIDO: ${formatCurrency(totalGeral)}*`);*/
+  const totalGeral = carrinho.reduce((total, item) => total + (item.valor * item.quantidade), 0);
+  linhas.push(`*VALOR TOTAL DO PEDIDO: ${formatCurrency(totalGeral)}*`);
 
   linhas.push('');
-  linhas.push('— Enviado via App de Contagem UP Electronics —');
+  linhas.push('— Enviado via App de Pedidos UP Electronics —');
   return linhas.join('\n');
 }
 
@@ -550,7 +549,7 @@ function enviarPedidoCheckout() {
   const __w = window.open(url, '_blank');
   try { if (__w) __w.opener = null; } catch (_) {}
 
-  showToast('Abrindo WhatsApp para finalizar a contagem...');
+  showToast('Abrindo WhatsApp para finalizar o pedido…');
   closeCheckoutModal();
 }
 
@@ -595,15 +594,15 @@ async function gerarPDF() {
       
       // Posição X do texto (à direita do logo)
       const textX = imgX + imgWidth + 5; // 10 (margem) + 30 (logo) + 5 (espaço)
-      doc.text("Contagem UP Electronics", textX, y);
+      doc.text("Pedido UP Electronics", textX, y);
     } catch (e) {
       console.error("Erro ao adicionar logo no PDF:", e);
       // Fallback se o logo (base64) falhar
-      doc.text("Contagem UP Electronics", 10, y);
+      doc.text("Pedido UP Electronics", 10, y);
     }
   } else {
     // Sem logo, começa na margem esquerda
-    doc.text("Contagem UP Electronics", 10, y);
+    doc.text("Pedido UP Electronics", 10, y);
   }
 
   y += 7;
@@ -633,7 +632,7 @@ async function gerarPDF() {
   // --- 4. Cabeçalho da Tabela de Itens ---
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(10);
-  doc.text("Itens da Contagem:", 10, y);
+  doc.text("Itens do Pedido:", 10, y);
   y += 2;
   doc.line(10, y, 200, y);
   y += 7;
@@ -649,8 +648,8 @@ async function gerarPDF() {
   doc.text("Nome do produto", colNome, y);
   doc.text("SKU", colSKU, y);
   doc.text("Qtd.", colQtd, y, { align: 'right' });
-  /*doc.text("Vlr. Unit.", colVlrUnit, y, { align: 'right' });
-  doc.text("Vlr. Total", colVlrTotal, y, { align: 'right' });*/
+  doc.text("Vlr. Unit.", colVlrUnit, y, { align: 'right' });
+  doc.text("Vlr. Total", colVlrTotal, y, { align: 'right' });
   y += 3;
   doc.line(10, y, 200, y); // Linha horizontal
   y += 7;
@@ -670,8 +669,8 @@ async function gerarPDF() {
     doc.text(nomeLines, colNome, y);
     doc.text(item.sku, colSKU, y);
     doc.text(String(item.quantidade), colQtd, y, { align: 'right' });
-    /*doc.text(vlrUnitStr, colVlrUnit, y, { align: 'right' });
-    doc.text(vlrTotalStr, colVlrTotal, y, { align: 'right' });*/
+    doc.text(vlrUnitStr, colVlrUnit, y, { align: 'right' });
+    doc.text(vlrTotalStr, colVlrTotal, y, { align: 'right' });
 
     // Ajusta a altura Y baseado no número de linhas do nome
     const lineHeight = 5; // Altura aproximada da linha
@@ -729,7 +728,7 @@ async function gerarPDF() {
 
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(12);
-  /*doc.text(`VALOR TOTAL DO PEDIDO: ${formatCurrency(totalGeral)}`, colVlrTotal + 25, y, { align: 'right' }); */
+  doc.text(`VALOR TOTAL DO PEDIDO: ${formatCurrency(totalGeral)}`, colVlrTotal + 25, y, { align: 'right' }); // Alinhado à direita da página
 
   // --- 7. Marca d'água de Data/Hora ---
   const data = new Date().toLocaleString('pt-BR', {
@@ -746,7 +745,7 @@ async function gerarPDF() {
 
   // --- 8. Salvar o PDF ---
   try {
-    doc.save(`contagem-${hNome || 'cliente'}.pdf`);
+    doc.save(`pedido-${hNome || 'cliente'}.pdf`);
     showToast('Gerando PDF...');
   } catch (e) {
     console.error("Erro ao gerar PDF:", e);
@@ -779,27 +778,53 @@ function onScroll() {
   else hdr.classList.remove('compact');
 }
 
-// Funções de Zoom
-function showZoom(e) {
-  // A lógica de zoom só deve ser acionada pelo 'mousedown' ou 'touchstart'
-  if (e.type === 'mousedown' && e.button !== 0) return; // Ignora clique direito/meio
-
-  const cardImg = e.target.closest('.card-img');
-  if (!cardImg) return;
-  
-  const img = cardImg.querySelector('img');
-  if (!img || !img.src || img.src.includes('placehold.co')) return;
-
-  e.preventDefault(); 
-  
-  zoomOverlayImg.src = img.src;
+// Funções de Zoom (MODIFICADAS)
+function showZoom(src) {
+  // Mostra o zoom se um 'src' válido for passado
+  if (!src) return;
+  zoomOverlayImg.src = src;
   zoomOverlay.classList.add('visible');
 }
 
 function hideZoom() {
   zoomOverlay.classList.remove('visible');
   // Atraso para a animação de fade-out terminar antes de limpar o src
-  setTimeout(() => { zoomOverlayImg.src = ''; }, 2000);
+  setTimeout(() => { zoomOverlayImg.src = ''; }, 200);
+}
+
+// Novas funções de controle do zoom (para segurar 2 segundos)
+function handleZoomStart(e) {
+  // Ignora clique direito/meio
+  if (e.type === 'mousedown' && e.button !== 0) return; 
+
+  const cardImg = e.target.closest('.card-img');
+  if (!cardImg) return;
+  
+  const img = cardImg.querySelector('img');
+  if (!img || !img.src || img.src.includes('placehold.co')) return;
+  
+  // Limpa qualquer timer anterior
+  clearTimeout(zoomHoldTimer);
+  
+  // Inicia o timer para "segurar" por 2 segundos
+  zoomHoldTimer = setTimeout(() => {
+    // PREVINE o scroll/clique APENAS SE o zoom for ativado
+    if (e.cancelable) e.preventDefault(); 
+    showZoom(img.src);
+  }, 2000); // <-- CORRIGIDO: Definido para 2000ms (2 segundos)
+}
+
+function handleZoomMove(e) {
+  // Se mover o dedo/mouse, cancela o timer de "segurar"
+  clearTimeout(zoomHoldTimer);
+}
+
+function handleZoomEnd(e) {
+  // Apenas limpa o timer.
+  // NÃO chama hideZoom() aqui.
+  // Isso garante que se o zoom abriu (após 2s), ele permanece aberto
+  // até o usuário clicar no overlay.
+  clearTimeout(zoomHoldTimer);
 }
 
 /*
@@ -864,20 +889,21 @@ function setupEventListeners() {
   });
   
   // --- Grid (Zoom da Imagem) ---
-  if (isMobile()) {
-    grid.addEventListener('touchstart', showZoom, { passive: true });
-  } else {
-    // 'mousedown' previne o "arrastar" fantasma da imagem
-    grid.addEventListener('mousedown', showZoom); 
-  }
+  // Eventos de mouse (Desktop)
+  grid.addEventListener('mousedown', handleZoomStart);
+  grid.addEventListener('mouseup', handleZoomEnd);
+  grid.addEventListener('mouseleave', handleZoomEnd); // Para mouse sair do grid
+  grid.addEventListener('mousemove', handleZoomMove); // <-- ADICIONADO
+
+  // Eventos de toque (Mobile)
+  grid.addEventListener('touchstart', handleZoomStart, { passive: false }); 
+  grid.addEventListener('touchend', handleZoomEnd);
+  grid.addEventListener('touchcancel', handleZoomEnd);
+  grid.addEventListener('touchmove', handleZoomMove); // <-- MUDADO para handleZoomMove
 
   // --- Eventos para fechar o zoom ---
-  zoomOverlay.addEventListener('mouseup', hideZoom);
-  zoomOverlay.addEventListener('mouseleave', hideZoom);
-  zoomOverlay.addEventListener('touchend', hideZoom);
-  zoomOverlay.addEventListener('touchcancel', hideZoom);
-  // Fallback de clique simples para fechar
-  zoomOverlay.addEventListener('click', hideZoom); 
+  zoomOverlay.addEventListener('click', hideZoom); // Este é o único que fecha
+  zoomOverlay.addEventListener('touchend', hideZoom); // Adicionado para fechar no toque
 
   // --- Modal de Item (Ações) ---
   btnAdicionar.addEventListener('click', adicionarAoCarrinho);
