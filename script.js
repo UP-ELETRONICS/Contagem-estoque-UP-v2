@@ -788,11 +788,20 @@ function showZoom(src) {
 }
 
 function hideZoom() {
-  zoomOverlay.classList.remove('visible');
-  setTimeout(() => { 
-    zoomOverlayImg.src = ''; 
-    isZooming = false; // Limpa a flag SÓ DEPOIS da animação
-  }, 200); // 200ms para corresponder à animação CSS e evitar o "crash"
+  // Limpa o timer (caso o usuário solte o dedo antes dos 2s)
+  if (zoomHoldTimer) {
+    clearTimeout(zoomHoldTimer);
+    zoomHoldTimer = null;
+  }
+  
+  // Esconde o zoom
+  if (isZooming) {
+    zoomOverlay.classList.remove('visible');
+    setTimeout(() => { 
+      zoomOverlayImg.src = ''; 
+      isZooming = false; // Limpa a flag SÓ DEPOIS da animação
+    }, 200); // 200ms para corresponder à animação CSS e evitar o "crash"
+  }
 }
 
 // Novas funções de controle do zoom (para segurar 2 segundos)
@@ -809,6 +818,9 @@ function handleZoomStart(e) {
     zoomHoldTimer = null;
     return;
   }
+
+  // Limpa qualquer timer anterior
+  clearTimeout(zoomHoldTimer);
   
   // Inicia o timer para "segurar" por 2 segundos
   zoomHoldTimer = setTimeout(() => {
