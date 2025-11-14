@@ -782,14 +782,17 @@ function onScroll() {
 function showZoom(src) {
   // Mostra o zoom se um 'src' válido for passado
   if (!src) return;
+  isZooming = true;
   zoomOverlayImg.src = src;
   zoomOverlay.classList.add('visible');
 }
 
 function hideZoom() {
   zoomOverlay.classList.remove('visible');
-  // Atraso para a animação de fade-out terminar antes de limpar o src
-  setTimeout(() => { zoomOverlayImg.src = ''; }, 200);
+  setTimeout(() => { 
+    zoomOverlayImg.src = ''; 
+    isZooming = false; // Limpa a flag SÓ DEPOIS da animação
+  }, 200); // 200ms para corresponder à animação CSS e evitar o "crash"
 }
 
 // Novas funções de controle do zoom (para segurar 2 segundos)
@@ -801,30 +804,41 @@ function handleZoomStart(e) {
   if (!cardImg) return;
   
   const img = cardImg.querySelector('img');
-  if (!img || !img.src || img.src.includes('placehold.co')) return;
-  
-  // Limpa qualquer timer anterior
-  clearTimeout(zoomHoldTimer);
+  if (!img || !img.src || img.src.includes('placehold.co')) {
+    clearTimeout(zoomHoldTimer);
+    zoomHoldTimer = null;
+    return;
+  }
   
   // Inicia o timer para "segurar" por 2 segundos
   zoomHoldTimer = setTimeout(() => {
-    // PREVINE o scroll/clique APENAS SE o zoom for ativado
+    // Se o timer completar, previne o comportamento padrão (como scroll)
     if (e.cancelable) e.preventDefault(); 
     showZoom(img.src);
-  }, 2000); // <-- CORRIGIDO: Definido para 2000ms (2 segundos)
+    zoomHoldTimer = null; // Limpa o timer
+  }, 2000); // 2000ms = 2 segundos
 }
 
 function handleZoomMove(e) {
-  // Se mover o dedo/mouse, cancela o timer de "segurar"
-  clearTimeout(zoomHoldTimer);
+  // Se o usuário mover o dedo/mouse, cancela o timer
+  if (zoomHoldTimer) {
+    clearTimeout(zoomHoldTimer);
+    zoomHoldTimer = null;
+  }
 }
 
+// 3. Fecha o zoom AO SOLTAR (se ele estiver aberto) ou cancela o timer (se não abriu)
 function handleZoomEnd(e) {
-  // Apenas limpa o timer.
-  // NÃO chama hideZoom() aqui.
-  // Isso garante que se o zoom abriu (após 2s), ele permanece aberto
-  // até o usuário clicar no overlay.
-  clearTimeout(zoomHoldTimer);
+  // Se o timer ainda estava rodando (soltou antes de 2s), cancela.
+  if (zoomHoldTimer) {
+    clearTimeout(zoomHoldTimer);
+    zoomHoldTimer = null;
+  }
+  // Se o zoom estiver visível (segurou por 2s e agora soltou), fecha.
+  else if (isZooming) {
+    if(e.cancelable) e.preventDefault();
+    hideZoom();
+  }
 }
 
 /*
@@ -902,8 +916,9 @@ function setupEventListeners() {
   grid.addEventListener('touchmove', handleZoomMove); // <-- MUDADO para handleZoomMove
 
   // --- Eventos para fechar o zoom ---
-  zoomOverlay.addEventListener('click', hideZoom); // Este é o único que fecha
-  zoomOverlay.addEventListener('touchend', hideZoom); // Adicionado para fechar no toque
+  // REMOVIDO: O fechamento agora é só no 'handleZoomEnd' (soltar)
+  // zoomOverlay.addEventListener('click', hideZoom); 
+  // zoomOverlay.addEventListener('touchend', hideZoom); 
 
   // --- Modal de Item (Ações) ---
   btnAdicionar.addEventListener('click', adicionarAoCarrinho);
