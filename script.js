@@ -286,8 +286,8 @@ function validateAdicionar() {
   const qtd = parseInt(mQtd.value, 10);
   if (!(qtd > 0)) return 'Quantidade inválida (deve ser 1 ou mais).';
   
-  // const valor = parseFloat(mValor.value.replace(',', '.')) || 0;
-  // if (!(valor > 0)) return 'Valor do item inválido.';
+  const valor = parseFloat(mValor.value.replace(',', '.')) || 0;
+  if (!(valor > 0)) return 'Valor do item inválido.';
   
   // CORREÇÃO: Validação do item curinga
   const nome = mProduto.value.trim();
